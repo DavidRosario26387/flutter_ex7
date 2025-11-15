@@ -1,0 +1,247 @@
+-------push--------
+
+git init
+git add .
+git commit -m "message"
+git branch -M main
+git remote add origin "repo-link"
+git push -u origin main
+
+--------branch-----------
+
+git checkout -b feature-branch
+git add .
+git commit -m "new feature"
+git push origin feature-branch
+
+(merge branges in github pull request)
+
+git checkout main
+git pull origin main
+
+
+-----docker------
+
+docker build -t myweb:v1 .
+docker run -d -p 8080:80 myweb:v1
+
+
+docker logout
+docker login
+docker tag myweb <your-dockerhub-username>/myweb:latest
+docker push <your-dockerhub-username>/myweb:latest
+
+docker pull <your-dockerhub-username>/myweb:latest
+docker run -p 8080:5000 <your-dockerhub-username>/myweb:latest
+
+
+
+
+---------ex2--------------
+
+-------docker container---
+
+mkdir docker-demo
+
+cd docker-demo
+
+
+----index.html----
+<h1>Hello from Docker!</h1>
+
+
+----Dockerfile----
+
+FROM nginx
+
+COPY index.html /usr/share/nginx/html/index.html
+
+----Build Docker Image----
+
+docker build -t myweb:v1 .
+
+----Run Docker Container----
+
+docker run -d -p 8080:80 myweb:v1
+
+Open browser → http://localhost:8080
+
+
+=================================================
+
+
+------------ex3-------------
+
+app.py
+
+from flask import Flask, render_template_string
+
+app = Flask(__name__)
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flask Docker App</title>
+<style>
+body {
+background: linear-gradient(to right, #00c6ff, #0072ff);
+color: white;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+text-align: center;
+padding-top: 100px;
+}
+
+h1 {
+font-size: 3em;
+margin-bottom: 0.2em;
+}
+p {
+font-size: 1.5em;
+}
+.card {
+background: rgba(255, 255, 255, 0.1);
+padding: 2em;
+border-radius: 20px;
+box-shadow: 0 0 20px rgba(0,0,0,0.3);
+width: 50%;
+margin: auto;
+}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>🚀 Welcome to Flask + Docker!</h1>
+<p>This is a vibrant web page running inside a Docker container.</p>
+<p>Change the code → Rebuild → Restart Docker to see updates!</p>
+</div>
+</body>
+</html>
+"""
+@app.route('/')
+def home():
+    return render_template_string(HTML_TEMPLATE)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+
+---------Dockerfile----------
+
+FROM python:3.9-slim
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
+
+
+
+--------requirements.txt-------------
+
+Flask==2.2.5
+
+----------commands----------
+
+docker build -t myapp .
+
+docker run -p 5000:5000 myapp
+
+ ( Visit: http://localhost:5050 )
+
+docker login
+
+docker tag myapp <your-dockerhub-username>/myapp:latest
+
+docker push <your-dockerhub-username>/myapp:latest
+
+docker pull <your-dockerhub-username>/myapp:latest
+
+docker run -p 5050:5000 <your-dockerhub-username>/myapp:latest
+
+
+
+----------------------ex6------------------------
+
+==================================
+-----------install--------------
+choco install kubernetes-cli
+choco install minikube
+==================================
+
+minikube start --driver=docker
+kubectl apply -f nginx-pod.yaml
+kubectl get pods (wait till status turns -> running)
+kubectl describe pod nginx-pod
+kubectl port-forward pod/nginx-pod 8080:80
+
+( Then open http://localhost:8080 in your browser. )
+
+kubectl delete pod nginx-pod
+
+
+kubectl create deployment my-nginx --image=nginx
+kubectl get deployments
+kubectl get pods -l app=my-nginx
+
+kubectl scale deployment my-nginx --replicas=3
+kubectl get pods
+
+
+kubectl expose deployment my-nginx --type=NodePort --port=80
+
+kubectl get svc
+
+minikube service my-nginx --url
+
+
+
+
+kubectl delete svc my-nginx
+kubectl delete deployment my-nginx
+kubectl delete svc my-nginx
+kubectl delete all --all -n default
+
+minikube stop
+minikube delete
+
+
+-------------------ex7---------------------
+
+
+minikube start --driver=docker
+
+docker build -t <your-dockerhub-username>/flaskimage:1.0 .
+
+docker login
+docker push <your-dockerhub-username>/flaskimage:1.0
+
+kubectl apply -f python-deployment.yaml
+kubectl get deployments
+kubectl get pods (wait till status turns -> running )
+
+kubectl describe deployment python-web-deployment
+
+kubectl apply -f python-service.yaml
+kubectl get svc
+
+
+kubectl delete -f python-service.yaml
+kubectl delete -f python-deployment.yaml
+minikube stop
+minikube delete
+
+
+
+================
+
+-----git already logged in with another account --------
+
+go to Windows Credential Manager → Windows Credentials → Remove GitHub entries.
+
+run in git bash: 
+
+git config --global user.name "NewUsername"
+git config --global user.email "newemail@example.com"
